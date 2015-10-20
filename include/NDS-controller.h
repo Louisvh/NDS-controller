@@ -37,10 +37,14 @@
 int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen);
 /**
  * Connect using credentials in WFC bank.
- * Writes output to supplied terminal, acts silently if none is provided.
  */
 int WFCConnect(PrintConsole *console);
 
+
+/**
+ * Helper function for ManualConnect(~)
+ */
+Wifi_AccessPoint *findAP();
 
 /**
  * Standard keyboard callback placeholder
