@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef NDS_CONTROLLER_H
-#define NDS_CONTROLLER_H
+#ifndef WIFICONNECT_H
+#define WIFICONNECT_H
 
 #include <nds.h>
 #include <stdio.h>
@@ -32,16 +32,20 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-#include "wificonnect.h"
+/**
+ * Interactively lists WiFi connections, allow the user to select one and connect.
+ * Supports open connections and WEP secured ones.
+ */
+int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen);
+/**
+ * Connect using credentials in WFC bank.
+ */
+int WFCConnect(PrintConsole *console);
+
 
 /**
- * Standard keyboard callback placeholder
+ * Helper function for ManualConnect(~)
  */
-void OnKeyPressed(int key);
+Wifi_AccessPoint *findAP();
 
-/**
- * Entry point of the application
- */
-int main();
-
-#endif //NDS_CONTROLLER_H
+#endif //WIFICONNECT_H
