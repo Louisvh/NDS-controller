@@ -4,16 +4,7 @@
  *
  *
  */
-#include <nds.h>
-#include <stdio.h>
-#include <time.h>
-
-#include <dswifi9.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#define EMULATOR 1 //TODO zero this before deployment. Alt TODO: make dependent on build target
+#include "NDS-controller.h"
 
 int WFCConnect(PrintConsole *console) {
     consoleSelect(console);
@@ -31,11 +22,7 @@ int WFCConnect(PrintConsole *console) {
     }
 }
 
-/*
- * Show a list of WiFi connections, allow the user to select one and connect.
- * Supports open connections and WEP secured ones.
- */
-int ManualConnect(PrintConsole *console) {
+int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
     return -1;
 }
 
@@ -85,7 +72,7 @@ int main() {
         }
         if(pressed&(KEY_B)) {
             iprintf("PRESSED (B)\n");
-            if(ManualConnect(&bot_screen)) {
+            if(ManualConnect(&top_screen, &bot_screen)) {
                 consoleClear();
                 iprintf("Failed to connect. Retrying...\n");
                 iprintf("\n\nPress (A) to connect using WFC \n(Set-up using commercial game)\n");
