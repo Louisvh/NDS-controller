@@ -36,6 +36,7 @@
 
 #include "bg_temp.h"
 #include "bg_temp_sub.h"
+#include "bg_temp_sub_but.h"
 
 /**
  * Standard keyboard callback placeholder
