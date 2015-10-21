@@ -43,7 +43,7 @@ int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
 
     consoleSelect(bot_screen);
     iprintf("\n\nScanning...");
-    consoleSelect(top_screen);
+    //consoleSelect(top_screen); TODO decide where to put it all
     consoleClear();
 
     Wifi_InitDefault(INIT_ONLY);
@@ -127,7 +127,7 @@ Wifi_AccessPoint* findAP() {
         }
 
         consoleClear();
-        iprintf("%d WEP/Open APs detected\n\n\n", count-j);
+        iprintf(" %d WEP/Open APs detected\n\n\n", count-j);
         int displayend = displaytop + 6;
         if (displayend > count) {
             displayend = count;
@@ -136,8 +136,7 @@ Wifi_AccessPoint* findAP() {
             Wifi_AccessPoint tap;
             Wifi_GetAPData(i, &tap);
             if(tap.flags & WFLAG_APDATA_WPA) {
-                iprintf(" %s %.28s\n   WPA Sig:--\n\n",
-                        i == selected ? "->" : "  ",tap.ssid);
+                continue;
             } else {
                 iprintf(" %s %.28s\n %s Sig:%i\n\n", i == selected ? "->" : "  ", tap.ssid,
                         tap.flags & WFLAG_APDATA_WEP ? "WEP  " : "Open ", tap.rssi * 100 / 0xD0);

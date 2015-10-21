@@ -33,34 +33,43 @@ int main() {
     PrintConsole top_screen;
     PrintConsole bot_screen;
     Keyboard *kbd;
+    int bg_main, bg_sub;
+    u16* videoMemoryMain, videoMemorySub;
 
-    videoSetMode(MODE_0_2D);
-    videoSetModeSub(MODE_0_2D);
-
+    videoSetModeSub(MODE_5_2D);
+    videoSetMode(MODE_5_2D);
     vramSetBankA(VRAM_A_MAIN_BG);
     vramSetBankC(VRAM_C_SUB_BG);
 
-    consoleInit(&top_screen, 3,BgType_Text4bpp, BgSize_T_256x256, 31, 0, true, true);
-    consoleInit(&bot_screen, 3,BgType_Text4bpp, BgSize_T_256x256, 31, 0, false, true);
-    consoleSetWindow(&bot_screen, 1,1,31,13); // Don't overwrite keyboard, small frame
+    bg_main = bgInit(3, BgType_Bmp16, BgSize_B16_256x256, 2,0);
+    decompress(bg_tempBitmap, bgGetGfxPtr(bg_main), LZ77Vram);
 
-    kbd = keyboardInit(0,1,BgType_Text4bpp, BgSize_T_256x256, 3,1,false,true);
+    bg_sub = bgInitSub(3, BgType_Bmp8, BgSize_B8_256x256, 5,0);
+    decompress(bg_temp_subBitmap, bgGetGfxPtr(bg_sub), LZ77Vram);
+    dmaCopy(bg_temp_subPal, BG_PALETTE_SUB, 512);
+
+    consoleInit(&top_screen, 0,BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
+    consoleInit(&bot_screen, 0,BgType_Text4bpp, BgSize_T_256x256, 4, 0, false, true);
+    consoleSetWindow(&bot_screen, 1,1,30,22);
+    consoleSetWindow(&top_screen, 3,13,25,10);
+
+    kbd = keyboardInit(0,1,BgType_Text4bpp, BgSize_T_256x256, 5,3,false,true);
     kbd->OnKeyPressed = OnKeyPressed;
-
-    consoleSelect(&bot_screen);
 
     #ifndef EMULATOR
     while(1) { //breaks when connected properly
+        consoleSelect(&top_screen);
         consoleClear();
-        iprintf("\nPress (A) to connect using WFC \n\n");
-        iprintf("\nPress (B) to connect manually  \n");
+        BG_PALETTE[255] = RGB15(6,7,14);
+        top_screen.cursorY = 9;
+        iprintf("Select connection method\n\n");
         int pressed = 0;
         swiWaitForVBlank();
         scanKeys();
         pressed = keysDown();
         if(pressed&KEY_A) {
             consoleClear();
-            if(WFCConnect(&bot_screen)) {
+            if(WFCConnect(&top_screen)) {
                 consoleClear();
                 iprintf("Failed to connect. Retrying...\n");
                 continue;

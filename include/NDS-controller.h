@@ -34,6 +34,9 @@
 
 #include "wificonnect.h"
 
+#include "bg_temp.h"
+#include "bg_temp_sub.h"
+
 /**
  * Standard keyboard callback placeholder
  */
