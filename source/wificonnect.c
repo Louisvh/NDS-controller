@@ -25,11 +25,19 @@ int WFCConnect(PrintConsole *console) {
     consoleSelect(console);
     consoleClear();
 
+    bgSetScroll(2,128,0);
+    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2])+bg_bot2MapLen/2, bg_bot2MapLen/2);
+    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2]), bg_bot2MapLen/2);
+    bgUpdate();
+
     iprintf("\nLoading connection info \nfrom WFC storage \n\n(set-up using commercial rom)");
     iprintf("\n\nConnecting...");
 
     if(!Wifi_InitDefault(WFC_CONNECT)) {
         iprintf("Failed to connect!");
+        dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2]), bg_bot2MapLen);
+        bgSetScroll(2,-0,0);
+        bgUpdate();
         return -1;
     } else {
         iprintf("Done\n");
@@ -41,20 +49,26 @@ int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
     int status = ASSOCSTATUS_DISCONNECTED, wepmode = WEPMODE_NONE;
     char wepkey[64];
 
-    consoleSelect(bot_screen);
+    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2])+bg_bot2MapLen/2, bg_bot2MapLen/2);
+    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2]), bg_bot2MapLen/2);
+    bgUpdate();
+
+    consoleSelect(top_screen);
     iprintf("\n\nScanning...");
-    //consoleSelect(top_screen); TODO decide where to put it all
-    consoleClear();
+    consoleSelect(bot_screen);
 
     Wifi_InitDefault(INIT_ONLY);
-    Wifi_AccessPoint* ap = findAP();
+    Wifi_AccessPoint* ap = findAP(top_screen, bot_screen);
+    consoleClear();
+    swiWaitForVBlank();
 
-    iprintf("Connecting to %s\n", ap->ssid);
+    iprintf(" Connecting to %.14s\n", ap->ssid);
+    bot_screen->cursorY = 7;
 
     Wifi_SetIP(0,0,0,0,0);
 
     if (ap->flags & WFLAG_APDATA_WEP) {
-        iprintf("Enter Wep Key\n");
+        iprintf("  Enter Wep Key\n");
         while (wepmode == WEPMODE_NONE) {
             scanf("%s",wepkey);
             if (strlen(wepkey)==13) {
@@ -81,6 +95,8 @@ int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
         }
         swiWaitForVBlank();
     }
+    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2]), bg_bot2MapLen);
+    bgUpdate();
     if(status == ASSOCSTATUS_ASSOCIATED) {
         return 0;
     } else {
@@ -88,7 +104,7 @@ int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
     }
 }
 
-Wifi_AccessPoint* findAP() {
+Wifi_AccessPoint* findAP(PrintConsole *top_screen, PrintConsole *bot_screen) {
     int i;
     int selected = 0;
     int count = 0, displaytop = 0, displayend;
@@ -101,7 +117,8 @@ Wifi_AccessPoint* findAP() {
 
         count = Wifi_GetNumAP();
         consoleClear();
-        iprintf(" %d Available APs Detected \n\n\n\n\n", count);
+        iprintf("  %d Available APs Detected\n", count);
+        bot_screen->cursorY = 5;
         displayend = displaytop + 4;
         if (displayend > count) {
             displayend = count;
@@ -110,10 +127,10 @@ Wifi_AccessPoint* findAP() {
             Wifi_AccessPoint tap;
             Wifi_GetAPData(i, &tap);
             if(tap.flags & WFLAG_APDATA_WPA) {
-                iprintf(" %s %.28s\n    WPA Sig:%i\n\n", i == selected ? "-X" : "  ", tap.ssid,
+                iprintf("  %s %.28s\n    WPA Sig:%i\n\n", i == selected ? "-X" : "  ", tap.ssid,
                  tap.rssi * 100 / 0xD0);
             } else {
-                iprintf(" %s %.28s\n    %s Sig:%i\n\n", i == selected ? "->" : "  ", tap.ssid,
+                iprintf("  %s %.28s\n    %s Sig:%i\n\n", i == selected ? "->" : "  ", tap.ssid,
                         tap.flags & WFLAG_APDATA_WEP ? "WEP  " : "Open ", tap.rssi * 100 / 0xD0);
             }
         }

@@ -19,20 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-#ifndef NDS_CONTROLLER_H
-#define NDS_CONTROLLER_H
+#ifndef VIDEOTOOLS_H
+#define VIDEOTOOLS_H
 
 #include <nds.h>
-#include <stdio.h>
-#include <time.h>
 
-#include "wificonnect.h"
+#include "bg_top1.h"
+#include "bg_bot1.h"
+#include "bg_bot2.h"
 
+PrintConsole top_screen, bot_screen;
+Keyboard *kbd;
+int bg_bot[4], bg_top[4];
 
 /**
- * Entry point of the application
+ * Standard keyboard callback placeholder
  */
-int main();
+void OnKeyPressed(int key);
 
-#endif //NDS_CONTROLLER_H
+/**
+ * Initialize the backgrounds and consoles
+ */
+void videoInit();
+
+#endif //VIDEOTOOLS_H

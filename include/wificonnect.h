@@ -32,6 +32,8 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+ #include "videotools.h"
+
 /**
  * Interactively lists WiFi connections, allow the user to select one and connect.
  * Supports open connections and WEP secured ones.
@@ -46,6 +48,6 @@ int WFCConnect(PrintConsole *console);
 /**
  * Helper function for ManualConnect(~)
  */
-Wifi_AccessPoint *findAP();
+Wifi_AccessPoint *findAP(PrintConsole *top_screen, PrintConsole *bot_screen);
 
 #endif //WIFICONNECT_H
