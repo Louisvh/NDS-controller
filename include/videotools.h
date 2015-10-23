@@ -23,10 +23,14 @@
 #define VIDEOTOOLS_H
 
 #include <nds.h>
+#include <stdio.h>
 
 #include "bg_top1.h"
 #include "bg_bot1.h"
 #include "bg_bot2.h"
+
+#define OFFXTILE 2*256
+#define OFFYTILE 2*256
 
 PrintConsole top_screen, bot_screen;
 Keyboard *kbd;
@@ -41,5 +45,17 @@ void OnKeyPressed(int key);
  * Initialize the backgrounds and consoles
  */
 void videoInit();
+
+/**
+ * Scroll one layer to (x,y) in specified n frames
+ * If allow_skip is 1, the animation is skipped on keysDown()
+ */
+void animScrollBgAbs(int id, int new_x, int new_y, int frames, int allow_skip);
+
+/**
+ * Scroll one layer to (x_cur+x,y_cur+y) in specified n frames
+ * If allow_skip is 1, the animation is skipped on keysDown()
+ */
+void animScrollBgRel(int id, int x, int y, int frames, int allow_skip);
 
 #endif //VIDEOTOOLS_H

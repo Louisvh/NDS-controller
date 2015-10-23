@@ -25,9 +25,7 @@ int WFCConnect(PrintConsole *console) {
     consoleSelect(console);
     consoleClear();
 
-    bgSetScroll(2,128,0);
-    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2])+bg_bot2MapLen/2, bg_bot2MapLen/2);
-    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2]), bg_bot2MapLen/2);
+    animScrollBgAbs(bg_bot[2], OFFXTILE, OFFYTILE, 50, 1);
     bgUpdate();
 
     iprintf("\nLoading connection info \nfrom WFC storage \n\n(set-up using commercial rom)");
@@ -35,12 +33,12 @@ int WFCConnect(PrintConsole *console) {
 
     if(!Wifi_InitDefault(WFC_CONNECT)) {
         iprintf("Failed to connect!");
-        dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2]), bg_bot2MapLen);
-        bgSetScroll(2,-0,0);
+        animScrollBgAbs(bg_bot[2], OFFXTILE, OFFYTILE+192, 50, 1);
         bgUpdate();
         return -1;
     } else {
         iprintf("Done\n");
+        //todo, scroll bg_bot[2] even higher to something
         return 0;
     }
 }
@@ -49,8 +47,7 @@ int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
     int status = ASSOCSTATUS_DISCONNECTED, wepmode = WEPMODE_NONE;
     char wepkey[64];
 
-    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2])+bg_bot2MapLen/2, bg_bot2MapLen/2);
-    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2]), bg_bot2MapLen/2);
+    animScrollBgAbs(bg_bot[2], OFFXTILE, OFFYTILE, 50, 0);
     bgUpdate();
 
     consoleSelect(top_screen);
@@ -88,18 +85,18 @@ int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
     while(status != ASSOCSTATUS_ASSOCIATED && status != ASSOCSTATUS_CANNOTCONNECT) {
         status = Wifi_AssocStatus();
         consoleClear();
-        iprintf("Connecting. \n\nPress (B) to cancel");
+        iprintf("Connecting...");
         scanKeys();
         if(keysDown() & KEY_B) {
             break;
         }
         swiWaitForVBlank();
     }
-    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2]), bg_bot2MapLen);
     bgUpdate();
     if(status == ASSOCSTATUS_ASSOCIATED) {
         return 0;
     } else {
+        animScrollBgAbs(bg_bot[2], OFFXTILE, OFFYTILE+192, 50, 1);
         return -1;
     }
 }

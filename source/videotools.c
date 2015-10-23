@@ -28,9 +28,45 @@ void OnKeyPressed(int key) {
     }
 }
 
-void videoInit() {
-    int frames=0;
+void animScrollBgAbs(int id, int new_x, int new_y, int frames, int allow_skip) {
+    int prev_x = bgScrollTable[id]->x;
+    int prev_y = bgScrollTable[id]->y;
+    int diff_x = new_x - prev_x;
+    int diff_y = new_y - prev_y;
+    int frame = 0;
+    int div_x = (frames*frames);
+    int div_y = div_x;
 
+    bgScrollTable[id]->x = new_x;
+    bgScrollTable[id]->y = new_y;
+
+    //iprintf("%d, %d :: %d, %d\n",prev_x, prev_y,new_x,new_y); //debugging
+
+    /*
+     * Use quadratic convergence in both directions.
+     */
+    do {
+        int mult = (frames-frame)*(frames-frame);
+        bgSetScroll(id, new_x - mult * diff_x / div_x,
+                        new_y - mult * diff_y / div_y);
+        frame++;
+        bgUpdate();
+        scanKeys();
+        swiWaitForVBlank();
+    } while(!(keysDown() && allow_skip) && frame < frames);
+
+    bgSetScroll(id,new_x,new_y);
+    bgUpdate();
+    swiWaitForVBlank();
+}
+
+void animScrollBgRel(int id, int x, int y, int frames, int allow_skip) {
+    int cur_x = bgScrollTable[id]->x;
+    int cur_y = bgScrollTable[id]->y;
+    animScrollBgAbs(id, x+cur_x, y+cur_y, frames, allow_skip);
+}
+
+void videoInit() {
     // initialize video
     videoSetMode(MODE_0_2D);
     videoSetModeSub(MODE_0_2D);
@@ -43,8 +79,8 @@ void videoInit() {
     lcdSwap(); //put main engine on bottom
 
     // initialize backgrounds
-    bg_bot[2] = bgInit (2, BgType_Text8bpp, BgSize_T_256x256, 6, 3);
-    bg_bot[3] = bgInit (3, BgType_Text8bpp, BgSize_T_256x256, 5, 4);
+    bg_bot[2] = bgInit (2, BgType_Text8bpp, BgSize_T_256x512, 22, 4);
+    bg_bot[3] = bgInit (3, BgType_Text8bpp, BgSize_T_256x256, 5, 3);
     bg_top[3] = bgInitSub(3, BgType_Text8bpp, BgSize_T_256x256, 7, 1);
 
     // copy graphics to vram
@@ -71,19 +107,6 @@ void videoInit() {
     vramSetBankE(VRAM_E_BG_EXT_PALETTE);     // for main engine
     vramSetBankH(VRAM_H_SUB_BG_EXT_PALETTE); // for sub engine
 
-    do {
-        swiWaitForVBlank();
-        frames++;
-        bgUpdate();
-        scanKeys();
-
-        // let's make it obvious there are multiple backgrounds
-        bgSetScroll(bg_bot[2], frames*2, 0);
-    } while(!keysDown() && frames < 128);
-    bgSetScroll(bg_bot[2], 0, 0);
-    bgUpdate();
-    swiWaitForVBlank();
-
     consoleInit(&top_screen, 0,BgType_Text4bpp, BgSize_T_256x256, 4, 0, false, true);
     consoleInit(&bot_screen, 0,BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
     consoleSetWindow(&bot_screen, 1,1,30,24);
@@ -92,4 +115,16 @@ void videoInit() {
     //todo make some sort of keypad that fits in
     kbd = keyboardInit(kbd,1,BgType_Text4bpp, BgSize_T_256x256, 2,1,true,true);
     kbd->OnKeyPressed = OnKeyPressed;
+
+    bgSetScroll(bg_bot[2],0,OFFYTILE+192);
+    bgScrollTable[bg_bot[2]]->x = 0;
+    bgScrollTable[bg_bot[2]]->y = OFFYTILE+192;
+    bgUpdate();
+    swiWaitForVBlank();
+    while(!(keysDown())) { //debug
+        bgUpdate();
+        scanKeys();
+        swiWaitForVBlank();
+    }
+    animScrollBgAbs(bg_bot[2],OFFXTILE, OFFYTILE+192, 60, 0);
 }
