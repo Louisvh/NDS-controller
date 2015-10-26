@@ -22,6 +22,7 @@
 #include "selectsprite.h"
 
 void updateSelectSprite() {
+    int i;
     oamSet(
         &oamMain, //main display
         0, //oam entry to set
@@ -31,35 +32,63 @@ void updateSelectSprite() {
         select_sprite.size_bar,
         select_sprite.format_bar,
         select_sprite.gfx_bar,
-        select_sprite.rot_bar,
+        0, //rot
         true, //double the size of rotated sprites
         select_sprite.hidden_bar,
         false, false, //vflip, hflip
         false //apply mosaic
     );
-    oamRotateScale(&oamMain, 0, 0, (1 << 7), (1<<9));
+    oamRotateScale(&oamMain, 0, 0, (1 << 8), (1<<8));
+
+    for (i=0; i<4; i++) {
+        oamSet(
+            &oamMain, //main display
+            i+1, //oam entry to set
+            50*i+select_sprite.x_cor[i], 50*i+select_sprite.y_cor[i], //position
+            0, //priority
+            select_sprite.paletteAlpha_cor,
+            select_sprite.size_cor,
+            select_sprite.format_cor,
+            select_sprite.gfx_cor,
+            i*90, //rot
+            false, //double the size of rotated sprites
+            select_sprite.hidden_cor,
+            false,//hflip
+            false, //vflip
+            false //apply mosaic
+        );
+    }
+
     oamUpdate(&oamMain);
 }
 
 void initSelectSprite() {
+    int i;
+
     oamInit(&oamMain, SpriteMapping_1D_128, false);
 
     REG_BLDALPHA = (8) | (8<<8);
     REG_BLDCNT = BLEND_ALPHA | BLEND_SRC_SPRITE | BLEND_DST_BG2 | BLEND_DST_BG3;
 
     select_sprite.size_bar = SpriteSize_64x32;
-    select_sprite.format_bar = SpriteColorFormat_Bmp;
-    select_sprite.paletteAlpha_bar = 5;
-    select_sprite.rot_bar = 00;
+    select_sprite.format_bar = SpriteColorFormat_256Color;
+    select_sprite.paletteAlpha_bar = 15;
+    select_sprite.rot_bar = 0;
     select_sprite.gfx_bar = oamAllocateGfx(&oamMain, select_sprite.size_bar, select_sprite.format_bar);
     dmaFillHalfWords(ARGB16(1,31,31,31), select_sprite.gfx_bar, 64*32*2);
 
     select_sprite.size_cor = SpriteSize_16x16;
-    select_sprite.format_cor = SpriteColorFormat_Bmp;
+    select_sprite.format_cor = SpriteColorFormat_256Color;
     select_sprite.paletteAlpha_cor = 15;
-    select_sprite.rot_cor[0] = 0;
+    for(i=0; i<4; i++) {
+        select_sprite.rot_cor[i] = i*90;
+    }
     select_sprite.gfx_cor = oamAllocateGfx(&oamMain, select_sprite.size_cor, select_sprite.format_cor);
-    dmaFillHalfWords(ARGB16(1,31,31,31), select_sprite.gfx_cor, 64*32*2);
+    dmaCopy(selection_cornerTiles, select_sprite.gfx_cor, 16*16);
+    dmaCopy(selection_cornerPal, SPRITE_PALETTE, 512);
+
+    //debug
+    dmaCopy(selection_cornerTiles, select_sprite.gfx_bar, 16*16);
 }
 
 void hideSelectSprite() {

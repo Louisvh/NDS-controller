@@ -45,18 +45,20 @@ int main() {
             break;
         case 0:
             select_sprite.hidden_bar = false;
+            select_sprite.hidden_cor = false;
             select_sprite.x_bar = 7;
-            select_sprite.y_bar = (select_sprite.y_bar + 3) % 230;
+            //select_sprite.y_bar = (select_sprite.y_bar + 3) % 230; //debug
             if (psel != selection) {
                 psel = selection;
                 select_sprite.y_bar = 0;
             }
             if (select_sprite.y_bar < 10 || select_sprite.y_bar > 135) {
-                select_sprite.hidden_bar = true;
+                //select_sprite.hidden_bar = true; //debug
             }
             break;
         case 1:
             select_sprite.hidden_bar = false;
+            select_sprite.hidden_cor = false;
             select_sprite.x_bar = 135;
             select_sprite.y_bar = (select_sprite.y_bar + 3) % 230;
             if (psel != selection) {
