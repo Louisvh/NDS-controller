@@ -24,6 +24,7 @@
 
 #include <nds.h>
 #include <stdio.h>
+#include "selectsprite.h"
 
 #include "bg_top1.h"
 #include "bg_bot1.h"
@@ -32,9 +33,25 @@
 #define OFFXTILE 2*256
 #define OFFYTILE 2*256
 
+#define ANIM_FRAMES 50
+
+typedef struct {
+    int left, right, top, bot;
+} Box;
+
 PrintConsole top_screen, bot_screen;
 Keyboard *kbd;
 int bg_bot[4], bg_top[4];
+bg_scroll bg_scroll_table[8];
+
+void clearConsoles();
+
+/**
+ * Takes a touch position and four arrays of l,r,t,b bounds as input
+ * Returns the index of clicked box (index of bounds array) or -1
+ * Boxes assumed to not overlap
+ */
+int inBox(int n_boxes, Box *box_arr, touchPosition touch);
 
 /**
  * Standard keyboard callback placeholder
@@ -51,6 +68,11 @@ void videoInit();
  * If allow_skip is 1, the animation is skipped on keysDown()
  */
 void animScrollBgAbs(int id, int new_x, int new_y, int frames, int allow_skip);
+
+/**
+ * animScrollBgAbs with frames = ANIM_FRAMES and allow_skip = 0
+ */
+void animScroll(int id, int new_x, int new_y);
 
 /**
  * Scroll one layer to (x_cur+x,y_cur+y) in specified n frames

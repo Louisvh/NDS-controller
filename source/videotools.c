@@ -19,8 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- #include "videotools.h"
-
+#include "videotools.h"
 
 void OnKeyPressed(int key) {
     if(key > 0) {
@@ -28,27 +27,36 @@ void OnKeyPressed(int key) {
     }
 }
 
+int inBox(int n_boxes, Box *box_arr, touchPosition touch) {
+    int i;
+    int px = touch.px, py = touch.py;
+    for (i = 0; i<n_boxes; i++) {
+        if (px > box_arr[i].left && px < box_arr[i].right
+            && py > box_arr[i].top && py < box_arr[i].bot) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void animScrollBgAbs(int id, int new_x, int new_y, int frames, int allow_skip) {
-    int prev_x = bgScrollTable[id]->x;
-    int prev_y = bgScrollTable[id]->y;
+    int prev_x = bg_scroll_table[id].x;
+    int prev_y = bg_scroll_table[id].y;
     int diff_x = new_x - prev_x;
     int diff_y = new_y - prev_y;
     int frame = 0;
-    int div_x = (frames*frames);
-    int div_y = div_x;
+    int div = (frames*frames*frames);
 
-    bgScrollTable[id]->x = new_x;
-    bgScrollTable[id]->y = new_y;
-
-    //iprintf("%d, %d :: %d, %d\n",prev_x, prev_y,new_x,new_y); //debugging
+    bg_scroll_table[id].x = new_x;
+    bg_scroll_table[id].y = new_y;
 
     /*
-     * Use quadratic convergence in both directions.
+     * Use cubic convergence in both dimensions.
      */
     do {
-        int mult = (frames-frame)*(frames-frame);
-        bgSetScroll(id, new_x - mult * diff_x / div_x,
-                        new_y - mult * diff_y / div_y);
+        int mult = (frames-frame)*(frames-frame)*(frames-frame);
+        bgSetScroll(id, new_x - mult * diff_x / div,
+                    new_y - mult * diff_y / div);
         frame++;
         bgUpdate();
         scanKeys();
@@ -60,10 +68,21 @@ void animScrollBgAbs(int id, int new_x, int new_y, int frames, int allow_skip) {
     swiWaitForVBlank();
 }
 
+void animScroll(int id, int new_x, int new_y) {
+    animScrollBgAbs(id, new_x, new_y, ANIM_FRAMES, 0);
+}
+
 void animScrollBgRel(int id, int x, int y, int frames, int allow_skip) {
     int cur_x = bgScrollTable[id]->x;
     int cur_y = bgScrollTable[id]->y;
     animScrollBgAbs(id, x+cur_x, y+cur_y, frames, allow_skip);
+}
+
+void clearConsoles() {
+    consoleSelect(&top_screen);
+    consoleClear();
+    consoleSelect(&bot_screen);
+    consoleClear();
 }
 
 void videoInit() {
@@ -109,22 +128,21 @@ void videoInit() {
 
     consoleInit(&top_screen, 0,BgType_Text4bpp, BgSize_T_256x256, 4, 0, false, true);
     consoleInit(&bot_screen, 0,BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
-    consoleSetWindow(&bot_screen, 1,1,30,24);
+    consoleSetWindow(&bot_screen, 2,1,28,24);
     consoleSetWindow(&top_screen, 3,13,25,10);
+
+    // init the selection sprite
+    vramSetBankF(VRAM_F_MAIN_SPRITE);
+    initSelectSprite();
 
     //todo make some sort of keypad that fits in
     kbd = keyboardInit(kbd,1,BgType_Text4bpp, BgSize_T_256x256, 2,1,true,true);
     kbd->OnKeyPressed = OnKeyPressed;
 
     bgSetScroll(bg_bot[2],0,OFFYTILE+192);
-    bgScrollTable[bg_bot[2]]->x = 0;
-    bgScrollTable[bg_bot[2]]->y = OFFYTILE+192;
+    bg_scroll_table[bg_bot[2]].x = 0;
+    bg_scroll_table[bg_bot[2]].y = OFFYTILE+192;
     bgUpdate();
     swiWaitForVBlank();
-    while(!(keysDown())) { //debug
-        bgUpdate();
-        scanKeys();
-        swiWaitForVBlank();
-    }
-    animScrollBgAbs(bg_bot[2],OFFXTILE, OFFYTILE+192, 60, 0);
+    animScrollBgAbs(bg_bot[2],OFFXTILE, OFFYTILE+192, 60, 1);
 }
