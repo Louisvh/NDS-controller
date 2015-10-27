@@ -24,7 +24,7 @@
 
 
 int main() {
-    int pressed = 0, selection = 0, psel = 0;
+    int pressed = 0;
     touchPosition touch_loc;
     Box main_menu_boxes[4] = {  {8,122,35,158},
                                 {136,248,35,158},
@@ -37,43 +37,7 @@ int main() {
         BG_PALETTE_SUB[255] = RGB15(6,7,14);
         BG_PALETTE[255] = RGB15(31,31,31);
 
-        // selection sprite
-        switch (selection) {
-        case -1:
-            select_sprite.hidden_bar = true;
-            psel = selection;
-            break;
-        case 0:
-            select_sprite.hidden_bar = false;
-            select_sprite.hidden_cor = false;
-            select_sprite.x_bar = 7;
-            //select_sprite.y_bar = (select_sprite.y_bar + 3) % 230; //debug
-            if (psel != selection) {
-                psel = selection;
-                select_sprite.y_bar = 0;
-            }
-            if (select_sprite.y_bar < 10 || select_sprite.y_bar > 135) {
-                //select_sprite.hidden_bar = true; //debug
-            }
-            break;
-        case 1:
-            select_sprite.hidden_bar = false;
-            select_sprite.hidden_cor = false;
-            select_sprite.x_bar = 135;
-            select_sprite.y_bar = (select_sprite.y_bar + 3) % 230;
-            if (psel != selection) {
-                psel = selection;
-                select_sprite.y_bar = 0;
-            }
-            if (select_sprite.y_bar < 10 || select_sprite.y_bar > 135) {
-                select_sprite.hidden_bar = true;
-            }
-            break;
-        default:
-            selection = -1;
-            break;
-        }
-        updateSelectSprite();
+        placeSelectionSprite(main_menu_boxes, 2);
 
         consoleSelect(&bot_screen);
         consoleClear();
@@ -95,19 +59,21 @@ int main() {
         scanKeys();
         pressed = keysDown();
         if(pressed&KEY_B) {
-            selection = -1;
+            selector.selection = -1;
         }
         if(pressed&KEY_A) {
-            if(selection == 1) {
+            if(selector.selection == 1) {
                 clearConsoles();
+                hideSelectSprite();
                 if(WFCConnect(&top_screen)) {
                     consoleClear();
                     continue;
                 } else {
                     break;
                 }
-            } else if(!selection){
+            } else if(!selector.selection){
                 clearConsoles();
+                hideSelectSprite();
                 if(ManualConnect(&top_screen, &bot_screen)) {
                     consoleClear();
                     continue;
@@ -115,20 +81,21 @@ int main() {
                     break;
                 }
             } else {
-                selection = 0;
+                selector.selection = 0;
             }
         }
         if(pressed&KEY_LEFT || pressed&KEY_RIGHT) {
-            if(selection < 0) {
-                selection = 0;
+            if(selector.selection < 0) {
+                selector.selection = pressed&KEY_RIGHT;
             } else {
-                selection = !selection;
+                selector.selection = !selector.selection;
             }
         }
         if(pressed&KEY_TOUCH) {
             int box_click;
 
             touchRead(&touch_loc);
+            box_click = inBox(4, main_menu_boxes, touch_loc);
 
             if(box_click == 0) {
                 clearConsoles();
@@ -150,7 +117,7 @@ int main() {
                     break;
                 }
             } else if (box_click == 3){
-                if(selection == 1) {
+                if(selector.selection == 1) {
                     clearConsoles();
                     hideSelectSprite();
                     if(WFCConnect(&top_screen)) {
@@ -159,7 +126,7 @@ int main() {
                     } else {
                         break;
                     }
-                } else if(!selection){
+                } else if(!selector.selection){
                     clearConsoles();
                     hideSelectSprite();
                     iprintf("Controller Connection Setup");
@@ -170,10 +137,10 @@ int main() {
                         break;
                     }
                 } else {
-                    selection = 0;
+                    selector.selection = 0;
                 }
             } else if (box_click == 2) {
-                selection = -1;
+                selector.selection = -1;
             }
         }
     } // while not connected
@@ -181,12 +148,12 @@ int main() {
 
     clearConsoles();
 
+    consoleSelect(&top_screen);
+    iprintf("\nConnection successful! :)\n");
+
     do {
         scanKeys();
         pressed = keysDown();
-        consoleClear();
-        consoleSelect(&top_screen);
-        iprintf("\nWe're connected! :)\n");
         swiWaitForVBlank();
     } while (! (pressed&KEY_START));
 

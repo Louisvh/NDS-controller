@@ -1,7 +1,9 @@
--m!
--gB8
+-m
+-gB16
 #metatile
--Mh1
--Mw1
+#-Mh2
+#-Mw2
 
 -gT ff00f6
+
+-gb

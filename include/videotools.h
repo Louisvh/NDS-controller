@@ -35,10 +35,6 @@
 
 #define ANIM_FRAMES 50
 
-typedef struct {
-    int left, right, top, bot;
-} Box;
-
 PrintConsole top_screen, bot_screen;
 Keyboard *kbd;
 int bg_bot[4], bg_top[4];

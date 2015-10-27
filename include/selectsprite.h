@@ -23,7 +23,12 @@
 #define SELECTSPRITE_H
 
 #include <nds.h>
+
 #include "selection_corner.h"
+
+typedef struct {
+    int left, right, top, bot;
+} Box;
 
 typedef struct {
     u16 *gfx_bar;
@@ -35,7 +40,7 @@ typedef struct {
     int y_bar;
     int hidden_bar;
 
-    u16 *gfx_cor;
+    u16 *gfx_cor[4];
     SpriteSize size_cor;
     SpriteColorFormat format_cor;
     int rot_cor[4];
@@ -43,14 +48,18 @@ typedef struct {
     int x_cor[4];
     int y_cor[4];
     int hidden_cor;
+    int selection;
+    int prev_sel;
 } BoxSelectionSprite;
 
-BoxSelectionSprite select_sprite;
+BoxSelectionSprite selector;
 
 void initSelectSprite();
 
 void updateSelectSprite();
 
 void hideSelectSprite();
+
+void placeSelectionSprite(Box *boxes, int n_boxes);
 
 #endif // SELECTSPRITE_H
