@@ -95,6 +95,19 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
+icons = $(wildcard *.bmp)
+
+ifneq (,$(findstring $(TARGET).bmp,$(icons)))
+    export GAME_ICON := $(CURDIR)/$(TARGET).bmp
+else
+    ifneq (,$(findstring icon.bmp,$(icons)))
+        export GAME_ICON := $(CURDIR)/icon.bmp
+    endif
+endif
+
+export GAME_SUBTITLE1  := Alpha build
+export GAME_SUBTITLE2  := By Louisvh
+
 .PHONY: $(BUILD) clean
 
 #---------------------------------------------------------------------------------

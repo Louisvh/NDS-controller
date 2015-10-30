@@ -28,7 +28,8 @@
 
 #include "bg_top1.h"
 #include "bg_bot1.h"
-#include "bg_bot2.h"
+#include "bg_bot21.h"
+#include "bg_bot22.h"
 
 #define OFFXTILE 2*256
 #define OFFYTILE 2*256
@@ -58,6 +59,8 @@ void OnKeyPressed(int key);
  * Initialize the backgrounds and consoles
  */
 void videoInit();
+
+void loadMainMenu();
 
 /**
  * Scroll one layer to (x,y) in specified n frames

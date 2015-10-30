@@ -85,6 +85,14 @@ void clearConsoles() {
     consoleClear();
 }
 
+void loadMainMenu() {
+    dmaCopy(bg_bot22Tiles, bgGetGfxPtr(bg_bot[2]), bg_bot22TilesLen);
+    dmaCopy(bg_bot22Map, bgGetMapPtr(bg_bot[2]), bg_bot22MapLen);
+    vramSetBankE(VRAM_E_LCD);
+    dmaCopy(bg_bot22Pal, &VRAM_E_EXT_PALETTE[2][0], bg_bot21PalLen);
+    vramSetBankE(VRAM_E_BG_EXT_PALETTE);
+}
+
 void videoInit() {
     // initialize video
     videoSetMode(MODE_0_2D);
@@ -103,12 +111,12 @@ void videoInit() {
     bg_top[3] = bgInitSub(3, BgType_Text8bpp, BgSize_T_256x256, 7, 1);
 
     // copy graphics to vram
-    dmaCopy(bg_bot2Tiles, bgGetGfxPtr(bg_bot[2]), bg_bot2TilesLen);
+    dmaCopy(bg_bot21Tiles, bgGetGfxPtr(bg_bot[2]), bg_bot21TilesLen);
     dmaCopy(bg_bot1Tiles, bgGetGfxPtr(bg_bot[3]), bg_bot1TilesLen);
     dmaCopy(bg_top1Tiles, bgGetGfxPtr(bg_top[3]), bg_top1TilesLen);
 
     // copy maps to vram
-    dmaCopy(bg_bot2Map, bgGetMapPtr(bg_bot[2]), bg_bot2MapLen);
+    dmaCopy(bg_bot21Map, bgGetMapPtr(bg_bot[2]), bg_bot21MapLen);
     dmaCopy(bg_bot1Map, bgGetMapPtr(bg_bot[3]), bg_bot1MapLen);
     dmaCopy(bg_top1Map, bgGetMapPtr(bg_top[3]), bg_top1MapLen);
 
@@ -117,14 +125,14 @@ void videoInit() {
     vramSetBankH(VRAM_H_LCD); // sub engine
 
     // copy palettes to extended palette area
-    dmaCopy(bg_bot2Pal, &VRAM_E_EXT_PALETTE[2][0], bg_bot2PalLen);  // bg 0, slot 0
-    dmaCopy(bg_bot1Pal, &VRAM_E_EXT_PALETTE[3][0], bg_bot1PalLen); // bg 1, slot 12
+    dmaCopy(bg_bot21Pal, &VRAM_E_EXT_PALETTE[2][0], bg_bot21PalLen);
+    dmaCopy(bg_bot1Pal, &VRAM_E_EXT_PALETTE[3][0], bg_bot1PalLen);
     // same for sub engine
-    dmaCopy(bg_top1Pal, &VRAM_H_EXT_PALETTE[3][0], bg_top1PalLen); // bg 1, slot 12
+    dmaCopy(bg_top1Pal, &VRAM_H_EXT_PALETTE[3][0], bg_top1PalLen);
 
     // map vram banks to extended palettes
-    vramSetBankE(VRAM_E_BG_EXT_PALETTE);     // for main engine
-    vramSetBankH(VRAM_H_SUB_BG_EXT_PALETTE); // for sub engine
+    vramSetBankE(VRAM_E_BG_EXT_PALETTE);
+    vramSetBankH(VRAM_H_SUB_BG_EXT_PALETTE);
 
     consoleInit(&top_screen, 0,BgType_Text4bpp, BgSize_T_256x256, 4, 0, false, true);
     consoleInit(&bot_screen, 0,BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);

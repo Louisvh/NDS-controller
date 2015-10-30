@@ -37,8 +37,9 @@ int WFCConnect(PrintConsole *console) {
         bgUpdate();
         return -1;
     } else {
-        iprintf("Done\n");
-        //todo, scroll bg_bot[2] even higher to something
+        clearConsoles();
+        loadMainMenu();
+        animScroll(bg_bot[2], OFFXTILE, OFFYTILE+192);
         return 0;
     }
 }
@@ -94,6 +95,9 @@ int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
     }
     bgUpdate();
     if(status == ASSOCSTATUS_ASSOCIATED) {
+        clearConsoles();
+        loadMainMenu();
+        animScroll(bg_bot[2], OFFXTILE, OFFYTILE+192);
         return 0;
     } else {
         animScroll(bg_bot[2], OFFXTILE, OFFYTILE+192);

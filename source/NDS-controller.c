@@ -32,7 +32,6 @@ int main() {
                                 {136,248,172,188}};
     videoInit();
 
-#ifndef EMULATOR
     while(1) { //while not connected
         BG_PALETTE_SUB[255] = RGB15(6,7,14);
         BG_PALETTE[255] = RGB15(31,31,31);
@@ -143,8 +142,13 @@ int main() {
                 selector.selection = -1;
             }
         }
+        if (pressed & KEY_SELECT) { // TODO: REMOVE THIS DEBUG OPTION
+            animScroll(bg_bot[2], OFFXTILE, OFFYTILE);
+            loadMainMenu();
+            animScroll(bg_bot[2], OFFXTILE, OFFYTILE+192);
+            break;
+        }
     } // while not connected
-#endif // EMULATOR
 
     clearConsoles();
 
