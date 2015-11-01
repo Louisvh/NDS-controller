@@ -161,3 +161,144 @@ Wifi_AccessPoint* findAP(PrintConsole *top_screen, PrintConsole *bot_screen) {
 
     return &ap;
 }
+
+// Helper function for setupConnection()
+void printConnectionLoopText() {
+        consoleSelect(&bot_screen);
+        consoleClear();
+        iprintf("Controller Connection Setup");
+        bot_screen.cursorY = 9;
+        bot_screen.cursorX = 0;
+        iprintf(" Search for ");
+        bot_screen.cursorX = 18;
+        iprintf("Automatic \n\n");
+        iprintf("Access Point");
+        bot_screen.cursorX = 20;
+        iprintf("(WFC)");
+
+        consoleSelect(&top_screen);
+        consoleClear();
+        top_screen.cursorY = 7;
+        iprintf("Select connection method");
+}
+
+void setupConnection() {
+    int pressed = 0;
+        touchPosition touch_loc;
+        Box main_menu_boxes[4] = {  {8,122,35,158},
+                                    {136,248,35,158},
+                                    {8,122,172,188},
+                                    {136,248,172,188}};
+
+    while(1) { //while not connected
+        BG_PALETTE_SUB[255] = RGB15(6,7,14);
+        BG_PALETTE[255] = RGB15(31,31,31);
+
+        placeSelectionSprite(main_menu_boxes, 2);
+
+        //populate menu with text
+        printConnectionLoopText();
+
+        swiWaitForVBlank();
+        scanKeys();
+        pressed = keysDown();
+        if(pressed&KEY_B) {
+            selector.selection = -1;
+        }
+        if(pressed&KEY_A) {
+            if(selector.selection == 1) {
+                clearConsoles();
+                hideSelectSprite();
+                if(WFCConnect(&top_screen)) {
+                    consoleClear();
+                    continue;
+                } else {
+                    break;
+                }
+            } else if(!selector.selection){
+                clearConsoles();
+                hideSelectSprite();
+                if(ManualConnect(&top_screen, &bot_screen)) {
+                    consoleClear();
+                    continue;
+                } else {
+                    break;
+                }
+            } else {
+                selector.selection = 0;
+            }
+        }
+        if(pressed&KEY_LEFT || pressed&KEY_RIGHT) {
+            if(selector.selection < 0) {
+                selector.selection = (pressed&KEY_RIGHT)!=0;
+            } else {
+                selector.selection = !selector.selection;
+            }
+        }
+        if(pressed&KEY_TOUCH) {
+            int box_click;
+
+            touchRead(&touch_loc);
+            box_click = inBox(4, main_menu_boxes, touch_loc);
+
+            if(box_click == 0) {
+                clearConsoles();
+                hideSelectSprite();
+                if(ManualConnect(&top_screen, &bot_screen)) {
+                    consoleClear();
+                    continue;
+                } else {
+                    break;
+                }
+            } else if (box_click == 1) {
+                clearConsoles();
+                hideSelectSprite();
+                iprintf("Controller Connection Setup");
+                if(WFCConnect(&top_screen)) {
+                    consoleClear();
+                    continue;
+                } else {
+                    break;
+                }
+            } else if (box_click == 3){
+                if(selector.selection == 1) {
+                    clearConsoles();
+                    hideSelectSprite();
+                    if(WFCConnect(&top_screen)) {
+                        consoleClear();
+                        continue;
+                    } else {
+                        break;
+                    }
+                } else if(!selector.selection){
+                    clearConsoles();
+                    hideSelectSprite();
+                    iprintf("Controller Connection Setup");
+                    if(ManualConnect(&top_screen, &bot_screen)) {
+                        consoleClear();
+                        continue;
+                    } else {
+                        break;
+                    }
+                } else {
+                    selector.selection = 0;
+                }
+            } else if (box_click == 2) {
+                selector.selection = -1;
+            }
+        }
+        if (pressed & KEY_SELECT) { // TODO: REMOVE THIS DEBUG OPTION
+            hideSelectSprite();
+            clearConsoles();
+            animScroll(bg_bot[2], OFFXTILE, OFFYTILE);
+            loadMainMenu();
+            animScroll(bg_bot[2], OFFXTILE, OFFYTILE+192);
+            break;
+        }
+    } // while not connected
+
+    clearConsoles();
+
+    consoleSelect(&top_screen);
+    iprintf("\nConnection successful! :)\n");
+}

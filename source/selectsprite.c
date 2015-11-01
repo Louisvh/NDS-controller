@@ -87,6 +87,7 @@ void initSelectSprite() {
 }
 
 void hideSelectSprite() {
+    selector.selection = 0;
     selector.y_bar = 0;
     selector.hidden_bar = true;
     selector.hidden_cor = true;

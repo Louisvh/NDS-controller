@@ -19,39 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-#ifndef WIFICONNECT_H
-#define WIFICONNECT_H
+#ifndef MAINMENU_H
+#define MAINMENU_H
 
 #include <nds.h>
-#include <stdio.h>
-#include <time.h>
-
-#include <dswifi9.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
 #include "videotools.h"
 
-/**
- * Interactively lists WiFi connections, allow the user to select one and connect.
- * Supports open connections and WEP secured ones.
- */
-int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen);
-/**
- * Connect using credentials in WFC bank.
- */
-int WFCConnect(PrintConsole *console);
+void mainMenuLoop();
 
-/**
- * Helper function for ManualConnect(~)
- */
-Wifi_AccessPoint *findAP(PrintConsole *top_screen, PrintConsole *bot_screen);
-
-/**
- * Full connection setup routine - part of the main program flow
- */
-void setupConnection();
-
-#endif //WIFICONNECT_H
+#endif //MAINMENU_H
