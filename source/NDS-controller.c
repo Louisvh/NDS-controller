@@ -143,6 +143,8 @@ int main() {
             }
         }
         if (pressed & KEY_SELECT) { // TODO: REMOVE THIS DEBUG OPTION
+            hideSelectSprite();
+            clearConsoles();
             animScroll(bg_bot[2], OFFXTILE, OFFYTILE);
             loadMainMenu();
             animScroll(bg_bot[2], OFFXTILE, OFFYTILE+192);
