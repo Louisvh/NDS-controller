@@ -60,7 +60,7 @@ int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
     consoleClear();
     swiWaitForVBlank();
 
-    iprintf(" Connecting to %.14s\n", ap->ssid);
+    iprintf(" Connecting to %.12s\n", ap->ssid);
     bot_screen->cursorY = 7;
 
     Wifi_SetIP(0,0,0,0,0);
@@ -74,8 +74,18 @@ int ManualConnect(PrintConsole *top_screen, PrintConsole *bot_screen) {
             } else if (strlen(wepkey) == 5) {
                 wepmode = WEPMODE_40BIT;
             } else {
-                iprintf("Only 5-digit and 13-digit WEP keys are supported!\n");
-                return -1;
+                int i=keysCurrent();
+                while(!(i&KEY_A || i&KEY_B)) {
+                    i=keysCurrent();
+                    consoleClear();
+                    iprintf("Error\n");
+                    bot_screen->cursorY = 7;
+                    iprintf("Only 5-digit and 13-digit \nWEP keys are supported!");
+                    swiWaitForVBlank();
+                }
+                clearConsoles();
+                animScroll(bg_bot[2], OFFXTILE, OFFYTILE+192);
+                return ManualConnect(top_screen, bot_screen); //try again
             }
         }
         Wifi_ConnectAP(ap, wepmode, 0, (u8*)wepkey);
