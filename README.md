@@ -6,7 +6,16 @@ connect to an Android device over WiFi and to function as an input device.
 The main use case is controlling emulators: most emulated real-time games 
 tends to be a pain to play on a touch screen and greatly benefit from being 
 played on a gamepad. Sure, a bluetooth gamepad only costs like $50, but the 
-Nintendo DS that is gathering dust in your closet is currently free!
+Nintendo DS that is gathering dust in your closet is free!
+
+## Progress
+- [x] Create some sort of connection wizzard
+- [x] Make it pretty
+- [x] Enable connecting to a WiFi network
+- [x] Create an Android keyboard that accepts network packets as input
+- [ ] Fix that keyboard to not be a buggy mess and release its source code
+- [ ] Translate NDS input to network packets and send them to Android device
+- [ ] Add a proper options menu on both sides to configure the input
 
 ## Usage 
 **NOTE:** The program doesn't actually work yet.
