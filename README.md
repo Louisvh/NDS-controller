@@ -5,26 +5,40 @@ NDS-controller is a client app for the Nintendo DS that allows the DS to
 connect to an Android device over WiFi and to function as an input device. 
 The main use case is controlling emulators: most emulated real-time games 
 tends to be a pain to play on a touch screen and greatly benefit from being 
-played on a gamepad. Sure, a bluetooth gamepad only costs like $50, but the 
+played on a gamepad. Sure, a Bluetooth gamepad only costs like $50, but the 
 Nintendo DS that is gathering dust in your closet is free!
 
 ## Progress
-- [x] Create some sort of connection wizzard
+- [x] Create some sort of connection wizard
 - [x] Make it pretty
 - [x] Enable connecting to a WiFi network
 - [x] Create an Android keyboard that accepts network packets as input
-- [ ] Fix that keyboard to not be a buggy mess and release its source code
 - [ ] Translate NDS input to network packets and send them to Android device
+- [x] Write a 3DS version
+- [ ] Make that 3DS version pretty
 - [ ] Add a proper options menu on both sides to configure the input
+- [ ] Open-source it all
 
 ## Usage 
-**NOTE:** The program doesn't actually work yet.
+**NOTE:** The NDS version doesn't work yet. I started this project long ago,
+shelved it after losing interest and un-shelved it after buying a 3DS.
+The NDS version started as an exercise in making something pretty and
+functional, but I lost interest before it became functional. I decided to 
+skip the "pretty" step in the 3DS version and got it working first. The 
+"pretty" may come at some later time.
 
-Build the APP into a .nds file using devkitARM. Run it using the compatible
+*NDS:*
+Build the client into a .nds file using devkitARM. Run it using the compatible
 homebrew-/flashcard of your choice. Follow the instructions on-screen to
 connect it to the same WiFi network your phone is on (a tethered hotspot is 
-fine too). Run the NDS-controller APP on your Android device and follow the 
+fine too). Run the NDS-controller app on your Android device and follow the 
 instructions from there.
+
+*3DS:*
+Build the client using devkitARM. Install it using your preferred method.
+Run the app in Android, match your 3DS client to the IP address displayed
+on the screen and follow the instructions on the Android app.
+
 
 ## LICENSE
 :[MIT LICENSE](LICENSE)
