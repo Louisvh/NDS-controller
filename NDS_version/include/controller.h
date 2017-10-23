@@ -19,13 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef MAINMENU_H
-#define MAINMENU_H
+
+#ifndef WIFICONNECT_H
+#define WIFICONNECT_H
 
 #include <nds.h>
+#include <stdio.h>
+#include <time.h>
+#include <errno.h>
+
+#include <dswifi9.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+
 #include "videotools.h"
-#include "controller.h"
 
-void mainMenuLoop();
+#define SOC_ALIGN       0x1000
+#define SOC_BUFFERSIZE  0x100000
+#define DEST_PORT 3210
 
-#endif //MAINMENU_H
+#define REDUNDANT_PACKETS 5
+
+/**
+ * Full controller routine - part of the main program flow
+ */
+void mainControlLoop(int player);
+
+#endif //WIFICONNECT_H

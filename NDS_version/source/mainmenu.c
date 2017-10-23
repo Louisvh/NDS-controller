@@ -28,19 +28,19 @@ void printMainMenuLoopText() {
         iprintf("Controller Main Menu");
         bot_screen.cursorY = 7;
         bot_screen.cursorX = 1;
-        iprintf("Lorem ");
+        iprintf("Player 1");
         bot_screen.cursorX = 17;
-        iprintf("Ipsum");
+        iprintf("Player 2");
         bot_screen.cursorY = 15;
         bot_screen.cursorX = 1;
-        iprintf("Dolor");
+        iprintf("Player 3");
         bot_screen.cursorX = 17;
-        iprintf("Amet");
+        iprintf("Player 4");
 
         consoleSelect(&top_screen);
         consoleClear();
         top_screen.cursorY = 7;
-        iprintf("Select connection method");
+        iprintf("Select Player ID");
 }
 
 void mainMenuLoop() {
@@ -53,7 +53,7 @@ void mainMenuLoop() {
                                 {8,122,172,188},
                                 {136,248,172,188}};
 
-    while(1) { //while not connected
+    while(1) { 
         BG_PALETTE_SUB[255] = RGB15(6,7,14);
         BG_PALETTE[255] = RGB15(31,31,31);
 
@@ -69,24 +69,11 @@ void mainMenuLoop() {
             selector.selection = -1;
         }
         if(pressed&KEY_A) {
-            if(selector.selection == 1) {
+            if(selector.selection > -1){
                 clearConsoles();
                 hideSelectSprite();
-                if(WFCConnect(&top_screen)) {
-                    consoleClear();
-                    continue;
-                } else {
-                    break;
-                }
-            } else if(!selector.selection){
-                clearConsoles();
-                hideSelectSprite();
-                if(ManualConnect(&top_screen, &bot_screen)) {
-                    consoleClear();
-                    continue;
-                } else {
-                    break;
-                }
+                mainControlLoop(selector.selection);
+                continue;
             } else {
                 selector.selection = 0;
             }
@@ -114,49 +101,21 @@ void mainMenuLoop() {
             touchRead(&touch_loc);
             box_click = inBox(4, main_menu_boxes, touch_loc);
 
-            if(box_click == 0) {
+            if(box_click >= 0 && box_click < 4) {
                 clearConsoles();
                 hideSelectSprite();
-                if(ManualConnect(&top_screen, &bot_screen)) {
-                    consoleClear();
-                    continue;
-                } else {
-                    break;
-                }
-            } else if (box_click == 1) {
-                clearConsoles();
-                hideSelectSprite();
-                iprintf("Controller Connection Setup");
-                if(WFCConnect(&top_screen)) {
-                    consoleClear();
-                    continue;
-                } else {
-                    break;
-                }
-            } else if (box_click == 3){
-                if(selector.selection == 1) {
+                mainControlLoop(box_click);
+                continue;
+            } else if (box_click == 5){
+                if(selector.selection > -1){
                     clearConsoles();
                     hideSelectSprite();
-                    if(WFCConnect(&top_screen)) {
-                        consoleClear();
-                        continue;
-                    } else {
-                        break;
-                    }
-                } else if(!selector.selection){
-                    clearConsoles();
-                    hideSelectSprite();
-                    iprintf("Controller Connection Setup");
-                    if(ManualConnect(&top_screen, &bot_screen)) {
-                        consoleClear();
-                        continue;
-                    } else {
-                        break;
-                    }
+                    mainControlLoop(selector.selection);
+                    continue;
                 } else {
                     selector.selection = 0;
                 }
-            } else if (box_click == 2) {
+            } else if (box_click == 4) {
                 selector.selection = -1;
             }
         }
@@ -168,6 +127,6 @@ void mainMenuLoop() {
             animScroll(bg_bot[2], OFFXTILE, OFFYTILE+192);
             break;
         }
-    } // while not connected
+    } 
 
 }
