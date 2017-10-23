@@ -1,6 +1,8 @@
 NDS-controller
 ===============
+
 QR-code placeholder
+
 ##Purpose
 NDS-controller is a client app for the Nintendo DS that allows the DS to 
 connect to an Android device over WiFi and to function as an input device. 
