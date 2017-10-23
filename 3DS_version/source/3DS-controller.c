@@ -19,8 +19,8 @@
 #define SOC_ALIGN       0x1000
 #define SOC_BUFFERSIZE  0x100000
 
-#define PHONE_ADDR "192.168.1.237"
-#define SPAMPORT 3210
+#define PHONE_ADDR "192.168.234.177"
+#define DEST_PORT 3210
 
 static u32 *SOC_buffer = NULL;
 s32 sock = -1, csock = -1;
@@ -28,13 +28,23 @@ s32 sock = -1, csock = -1;
 __attribute__((format(printf,1,2)))
 void failExit(const char *fmt, ...);
 
-
 //---------------------------------------------------------------------------------
 void socShutdown() {
 //---------------------------------------------------------------------------------
 	printf("waiting for socExit...\n");
 	socExit();
+}
 
+//---------------------------------------------------------------------------------
+u32 revEndian(u32 number) {
+//---------------------------------------------------------------------------------
+    u32 b0, b1, b2, b3;
+
+    b0 = (number & 0x000000ff) << 24u;
+    b1 = (number & 0x0000ff00) << 8u;
+    b2 = (number & 0x00ff0000) >> 8u;
+    b3 = (number & 0xff000000) >> 24u;
+    return (b0 | b1 | b2 | b3);
 }
 
 //---------------------------------------------------------------------------------
@@ -42,18 +52,14 @@ int main(int argc, char **argv) {
 //---------------------------------------------------------------------------------
 	int ret;
 
+
 	u32	slen;
 	struct sockaddr_in server;
 
 	gfxInitDefault();
-
-	// register gfxExit to be run when app quits
-	// this can help simplify error handling
 	atexit(gfxExit);
 
 	consoleInit(GFX_TOP, NULL);
-
-	printf ("\nlibctru sockets demo\n");
 
 	// allocate buffer for SOC service
 	SOC_buffer = (u32*)memalign(SOC_ALIGN, SOC_BUFFERSIZE);
@@ -83,38 +89,45 @@ int main(int argc, char **argv) {
 	memset (&server, 0, sizeof (server));
 
 	server.sin_family = AF_INET;
-	server.sin_port = htons (SPAMPORT);
+	server.sin_port = htons (DEST_PORT);
     if (inet_aton(PHONE_ADDR, &server.sin_addr) == 0) {
         failExit("inet_aton() failed\n");
     }
 
-	printf("Spamming %s:%d with UDP packets\n", PHONE_ADDR, SPAMPORT);
+	printf("Spamming %s:%d with UDP packets\n", PHONE_ADDR, DEST_PORT);
     
-	// Set socket non blocking so we can still read input to exit
 	fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) | O_NONBLOCK);
 
 	while (aptMainLoop()) {
-        u32 kHeld = 0;
-        u32 rev_endian = 0;
-        u32 b0,b1,b2,b3;
+        u32 kHeld, kDown, kUp;
+        u32 sendBuf[2]= {0,0};
+        u32 ID = 0; // TODO changeable playerID
+        int i=0;
 
-		gspWaitForVBlank();
 		hidScanInput();
 
+        kDown = hidKeysDown();
+        kUp = hidKeysUp();
 		kHeld = hidKeysHeld();
-        b0 = (kHeld & 0x000000ff) << 24u;
-        b1 = (kHeld & 0x0000ff00) << 8u;
-        b2 = (kHeld & 0x00ff0000) >> 8u;
-        b3 = (kHeld & 0xff000000) >> 24u;
-        rev_endian = b0 | b1 | b2 | b3;
 
-        if (sendto(sock, &rev_endian, 4 , 0 , (struct sockaddr *) &server, slen)==-1)
-        {
-            failExit("sendto()\n");
+        if ( kDown || kUp ) {
+            // We're sending from big to little endian architectures
+            sendBuf[0] = revEndian(kHeld);
+            sendBuf[1] = revEndian(ID);
+            if (sendto(sock, &sendBuf, 8 , 0 , (struct sockaddr *) &server, slen)==-1)
+            {
+                failExit("sendto()\n");
+            }
+            printf("\x1b[4;1HkHeld: ");
+            for(i=31; i>-1; i--){
+                printf("%d", (kHeld & (1 << i)) != 0);
+            }
         }
-        printf("sock: %d, kHeld: %d\n", sock, kHeld);
 
-		if (kHeld & KEY_START) break;
+		if (kHeld & KEY_START && kHeld & KEY_SELECT && 
+                kHeld & KEY_L && kHeld & KEY_R) break;
+
+		gspWaitForVBlank();
 	}
 
 	close(sock);
