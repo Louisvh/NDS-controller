@@ -36,8 +36,7 @@ void setIP() {
 
     consoleClear();
 	while (aptMainLoop()) {
-        u32 kHeld, kDown, kUp;
-        int i=0;
+        u32 kHeld, kDown;
 
         printf("\x1b[1;1HUse d-pad to change address\n");
         printf("Press the X button to confirm\n");
@@ -45,7 +44,6 @@ void setIP() {
 		hidScanInput();
 
         kDown = hidKeysDown();
-        kUp = hidKeysUp();
 		kHeld = hidKeysHeld();
 
         if ( kDown & KEY_RIGHT) {
