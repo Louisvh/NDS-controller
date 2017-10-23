@@ -111,7 +111,6 @@ int main(int argc, char **argv) {
 //---------------------------------------------------------------------------------
 	int ret;
 
-
 	u32	slen;
 	struct sockaddr_in server;
 

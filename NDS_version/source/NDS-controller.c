@@ -28,7 +28,6 @@ int main() {
 
     videoInit();
     setupConnection();
-
     mainMenuLoop();
 
     do {

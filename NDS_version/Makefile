@@ -14,7 +14,7 @@ include $(DEVKITARM)/ds_rules
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET		:=	$(shell basename $(CURDIR))
+TARGET		:=	NDS-controller
 BUILD		:=	build
 SOURCES		:=	source
 DATA		:=  
@@ -105,7 +105,7 @@ else
     endif
 endif
 
-export GAME_SUBTITLE1  := Alpha build
+export GAME_SUBTITLE1  := Version 1.0
 export GAME_SUBTITLE2  := By Louisvh
 
 .PHONY: $(BUILD) clean
