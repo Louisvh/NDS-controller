@@ -19,14 +19,75 @@
 #define SOC_ALIGN       0x1000
 #define SOC_BUFFERSIZE  0x100000
 
-#define PHONE_ADDR "192.168.234.177"
 #define DEST_PORT 3210
+
+char dest_addr[16] = "192.168.001.001";
 
 static u32 *SOC_buffer = NULL;
 s32 sock = -1, csock = -1;
 
 __attribute__((format(printf,1,2)))
 void failExit(const char *fmt, ...);
+
+//---------------------------------------------------------------------------------
+void setIP() {
+//---------------------------------------------------------------------------------
+    int charsel=0;
+
+    consoleClear();
+	while (aptMainLoop()) {
+        u32 kHeld, kDown, kUp;
+        int i=0;
+
+        printf("\x1b[1;1HUse d-pad to change address\n");
+        printf("Press the X button to confirm\n");
+
+		hidScanInput();
+
+        kDown = hidKeysDown();
+        kUp = hidKeysUp();
+		kHeld = hidKeysHeld();
+
+        if ( kDown & KEY_RIGHT) {
+            charsel = (charsel+1)%15;
+            if(dest_addr[charsel]=='.')
+                charsel = (charsel+1)%15;
+            consoleClear();
+        }
+        if ( kDown & KEY_LEFT) {
+            charsel = (charsel-1+15)%15;
+            if(dest_addr[charsel]=='.')
+                charsel = (charsel-1+15)%15;
+            consoleClear();
+        }
+        if ( kDown & KEY_UP) {
+            if(charsel%4)
+                dest_addr[charsel] = ((dest_addr[charsel]-'0'+1)%10)+'0';
+            else
+                dest_addr[charsel] = ((dest_addr[charsel]-'0'+1)%3)+'0';
+            consoleClear();
+        }
+        if ( kDown & KEY_DOWN) {
+            if(charsel%4)
+                dest_addr[charsel] = ((dest_addr[charsel]-'0'-1+10)%10)+'0';
+            else
+                dest_addr[charsel] = ((dest_addr[charsel]-'0'-1+3)%3)+'0';
+            consoleClear();
+        }
+
+        printf("\x1b[6;1HIP: %s", dest_addr);
+        printf("\x1b[7;%dH^", 5+charsel);
+
+
+		if (kHeld & KEY_X) {
+            consoleClear();
+            return;
+        }
+
+		gspWaitForVBlank();
+	}
+
+}
 
 //---------------------------------------------------------------------------------
 void socShutdown() {
@@ -86,16 +147,17 @@ int main(int argc, char **argv) {
 		failExit("socket: %d %s\n", errno, strerror(errno));
 	}
 
+    // ask for and link to the destination IP
+    setIP();
+
 	memset (&server, 0, sizeof (server));
 
 	server.sin_family = AF_INET;
 	server.sin_port = htons (DEST_PORT);
-    if (inet_aton(PHONE_ADDR, &server.sin_addr) == 0) {
+    if (inet_aton(dest_addr, &server.sin_addr) == 0) {
         failExit("inet_aton() failed\n");
     }
 
-	printf("Spamming %s:%d with UDP packets\n", PHONE_ADDR, DEST_PORT);
-    
 	fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) | O_NONBLOCK);
 
 	while (aptMainLoop()) {
@@ -104,6 +166,10 @@ int main(int argc, char **argv) {
         u32 ID = 0; // TODO changeable playerID
         int i=0;
 
+        printf("\x1b[1;1HSending to %s:%d", dest_addr, DEST_PORT);
+        printf("\x1b[8;1HPress Start+Select+down to change IP address");
+        printf("\x1b[18;1HPress Start+Select+L+R to quit");
+    
 		hidScanInput();
 
         kDown = hidKeysDown();
@@ -118,14 +184,19 @@ int main(int argc, char **argv) {
             {
                 failExit("sendto()\n");
             }
-            printf("\x1b[4;1HkHeld: ");
+            printf("\x1b[4;1HStatus: ");
             for(i=31; i>-1; i--){
                 printf("%d", (kHeld & (1 << i)) != 0);
             }
         }
 
 		if (kHeld & KEY_START && kHeld & KEY_SELECT && 
-                kHeld & KEY_L && kHeld & KEY_R) break;
+                kHeld & KEY_L && kHeld & KEY_R) {
+            break;
+        }
+		if (kHeld & KEY_START && kHeld & KEY_SELECT && kHeld & KEY_DOWN ) {
+            setIP();
+        }
 
 		gspWaitForVBlank();
 	}
