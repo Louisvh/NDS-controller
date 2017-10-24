@@ -15,6 +15,13 @@ tends to be a pain to play on a touch screen and greatly benefit from being
 played on a gamepad. Sure, a Bluetooth gamepad only costs like $50, but the 
 Nintendo DS that is gathering dust in your closet is free!
 
+I started this project long ago, shelved it after losing interest 
+and un-shelved it after buying a 3DS. The NDS version started as an exercise 
+in making something pretty and functional, but I lost interest before it became 
+functional. I decided to skip the "pretty" step in the 3DS version and got it
+working first. The "pretty" may come at some later time.
+
+
 ## Progress
 - [x] Create some sort of connection wizard
 - [x] Make it pretty
@@ -23,17 +30,11 @@ Nintendo DS that is gathering dust in your closet is free!
 - [x] Translate NDS input to network packets and send them to Android device
 - [x] Write a 3DS version
 - [ ] Make that 3DS version pretty
-- [ ] Add analog support for the n3DS o-pad
+- [ ] Add analog support for the 3DS o-pad
 - [ ] Add a proper options menu to configure the input
 - [x] Open-source it all
 
 **NOTE:** A flashcart or CFW is required on your (3)DS!
-
-I started this project long ago, shelved it after losing interest 
-and un-shelved it after buying a 3DS. The NDS version started as an exercise 
-in making something pretty and functional, but I lost interest before it became 
-functional. I decided to skip the "pretty" step in the 3DS version and got it
-working first. The "pretty" may come at some later time.
 
 ## Usage 
 
