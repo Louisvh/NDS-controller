@@ -1,10 +1,6 @@
 NDS-controller
 ===============
 
-3DS .cia link, scan in FBI to install:
-
-![v1 2 0qr](https://user-images.githubusercontent.com/6605273/31918707-655dbfc8-b85e-11e7-9d66-0a5043f072d7.png)
-
 [Link to Android host App](https://play.google.com/store/apps/details?id=com.ldvhrtn.ndscontroller)
 
 ## Purpose
@@ -50,6 +46,10 @@ Build the client using devkitARM or download it from __[here](https://github.com
 using your preferred method. Run the app in Android, match your 3DS client 
 to the IP address displayed on the screen and follow the instructions on the 
 Android app.
+
+
+3DS .cia link, scan in FBI to install:  
+![cia QR v1.2.0](https://user-images.githubusercontent.com/6605273/31919870-b90b7636-b865-11e7-8b23-934e8c221887.png)
 
 
 ## LICENSE
