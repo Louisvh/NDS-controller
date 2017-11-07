@@ -32,7 +32,7 @@ void failExit(const char *fmt, ...);
 //---------------------------------------------------------------------------------
 void setIP() {
 //---------------------------------------------------------------------------------
-    int charsel=0;
+    int charsel=0, i=0, invalid=0;
 
     consoleClear();
 	while (aptMainLoop()) {
@@ -59,25 +59,79 @@ void setIP() {
             consoleClear();
         }
         if ( kDown & KEY_UP) {
-            if(charsel%4)
-                dest_addr[charsel] = ((dest_addr[charsel]-'0'+1)%10)+'0';
-            else
-                dest_addr[charsel] = ((dest_addr[charsel]-'0'+1)%3)+'0';
+            switch(charsel%4) {
+                case 1:
+                    if(dest_addr[charsel-1] > '1') {
+                        dest_addr[charsel] = ((dest_addr[charsel]-'0'+1)%6)+'0';
+                    } else {
+                        dest_addr[charsel] = ((dest_addr[charsel]-'0'+1)%10)+'0';
+                    }
+                    break;
+                case 2:
+                    if(dest_addr[charsel-2] > '1' && dest_addr[charsel-1] > '4') {
+                        dest_addr[charsel] = ((dest_addr[charsel]-'0'+1)%6)+'0';
+                    } else {
+                        dest_addr[charsel] = ((dest_addr[charsel]-'0'+1)%10)+'0';
+                    }
+                    break;
+                default:
+                    dest_addr[charsel] = ((dest_addr[charsel]-'0'+1)%3)+'0';
+            }
             consoleClear();
         }
         if ( kDown & KEY_DOWN) {
-            if(charsel%4)
-                dest_addr[charsel] = ((dest_addr[charsel]-'0'-1+10)%10)+'0';
-            else
-                dest_addr[charsel] = ((dest_addr[charsel]-'0'-1+3)%3)+'0';
+            switch(charsel%4) {
+                case 1:
+                    if(dest_addr[charsel-1] > '1') {
+                        dest_addr[charsel] = ((dest_addr[charsel]-'0'-1+6)%6)+'0';
+                    } else {
+                        dest_addr[charsel] = ((dest_addr[charsel]-'0'-1+10)%10)+'0';
+                    }
+                    break;
+                case 2:
+                    if(dest_addr[charsel-2] > '1' && dest_addr[charsel-1] > '4') {
+                        dest_addr[charsel] = ((dest_addr[charsel]-'0'-1+6)%6)+'0';
+                    } else {
+                        dest_addr[charsel] = ((dest_addr[charsel]-'0'-1+10)%10)+'0';
+                    }
+                    break;
+                default:
+                    dest_addr[charsel] = ((dest_addr[charsel]-'0'-1+3)%3)+'0';
+            }
             consoleClear();
         }
 
-        printf("\x1b[6;1HIP: %s", dest_addr);
+        //check validity
+        invalid=0;
+        for(i=0; i<16; i++) {
+            switch(i%4) {
+                case 1:
+                    if(dest_addr[i-1] > '1' && dest_addr[i] > '5') {
+                        printf("\x1b[31m");
+                        i=16;
+                        invalid=1;
+                        break;
+                    }
+                    break;
+                case 2:
+                    if(dest_addr[i-2] > '1' && 
+                            dest_addr[i-1] > '4' && dest_addr[i] > '5') {
+                        printf("\x1b[31m");
+                        i=16;
+                        invalid=1;
+                        break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        printf("\x1b[6;1HIP: %s\x1b[0m", dest_addr);
         printf("\x1b[7;%dH^", 5+charsel);
 
 
-		if (kHeld & KEY_X) {
+		if (kHeld & KEY_X && !invalid) {
             consoleClear();
             return;
         }
