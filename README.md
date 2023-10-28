@@ -1,7 +1,7 @@
 NDS-controller
 ===============
 
-[Link to Android host App](https://play.google.com/store/apps/details?id=com.ldvhrtn.ndscontroller)
+[Link to Android host App](https://play.google.com/store/apps/details?id=com.ldvhrtn.ndscontroller), [Source for Android host App](https://github.com/Louisvh/NDS-controller-android-host).
 
 ## Purpose
 NDS-controller is a client app for the Nintendo DS that allows the DS to 
